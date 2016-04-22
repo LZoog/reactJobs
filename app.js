@@ -24,8 +24,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Replace the example database with yours
-mongoose.connect(process.env.DB_CONN_JOBBED_OUT);
-//mongoose.connect('mongodb://wdi:password@ds013891.mlab.com:13891/ga_jobbed_out');
+//mongoose.connect(process.env.DB_CONN_JOBBED_OUT);
+mongoose.connect('mongodb://wdi:password@ds013891.mlab.com:13891/ga_jobbed_out');
 
 app.use('/', routes);
 app.use('/api/v1/jobs', jobsApi);
