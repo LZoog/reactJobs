@@ -46,20 +46,28 @@ const JobList = React.createClass({
     e.preventDefault();
     var self = this;
 
-    console.log(e.target.newTitle);
-
     $.ajax({
       method: 'POST',
       url: '/api/v1/jobs',
       data: {
-        job: {title: e.target.newTitle, url: e.target.newLink, "company": e.target.newCompany}
+        job: {title: self.state.newTitle, link: self.state.newLink, company: self.state.newCompany}
       }
     })
     .done(function(newJob) {
       const allJobs = self.state.jobs;
-      allJobs.push(this.state.newJob);
-      self.setState({jobs: allJobs, title: '', url: '', company: ''});
+      allJobs.pop();
+      allJobs.unshift(newJob);
+      self.setState({jobs: allJobs, newTitle: '', newLink: '', newCompany: ''});
     });
+  },
+  titleChange: function(e) {
+    this.setState({newTitle: e.target.value});
+  },
+  linkChange: function(e) {
+    this.setState({newLink: e.target.value});
+  },
+  companyChange: function(e) {
+    this.setState({newCompany: e.target.value});
   },
   render: function() {
     var allJobs = this.state.jobs.map(function(job){
@@ -67,9 +75,9 @@ const JobList = React.createClass({
     })
     return <div id="job-add-list">
       <form onSubmit={this.addJob}>
-        <input type="text" value={this.state.newTitle} placeholder="Job Title" />
-        <input type="text" value={this.state.newLink} placeholder="URL" />
-        <input type="text" value={this.state.newCompany} placeholder="Company" />
+        <input type="text" onChange={this.titleChange} value={this.state.newTitle} placeholder="Job Title" />
+        <input type="text" onChange={this.linkChange} value={this.state.newLink} placeholder="URL" />
+        <input type="text" onChange={this.companyChange} value={this.state.newCompany} placeholder="Company" />
         <button type="submit" id="add-job">Add a Job</button>
       </form>
       {allJobs}
