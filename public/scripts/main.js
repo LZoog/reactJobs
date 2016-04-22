@@ -19136,4 +19136,41 @@ module.exports = require('./lib/React');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+const JobList = React.createClass({displayName: "JobList",
+  getInitialState: function() {
+    return {jobs: []};
+  },
+  componentDidMount: function() {
+    var self = this;
+    $.ajax({
+      method: "GET",
+      url: "/api/v1/jobs"
+    })
+    .done(function(jobsDB){
+      self.setState({jobs: jobsDB});
+    });
+  },
+  render: function() {
+    if (this.state.jobs.docs != undefined) {
+      var allJobs = this.state.jobs.docs.map(function(job){
+        return React.createElement(JobItem, {link: job.link, title: job.title, company: job.company, postedAt: job.createdAt, key: job._id})
+      })
+    }
+    return React.createElement("div", null, allJobs)
+  }
+})
+
+const JobItem = React.createClass({displayName: "JobItem",
+  render: function(){
+  return React.createElement("div", {className: "job"}, 
+    React.createElement("h3", null, React.createElement("a", {href: this.props.link}, this.props.title)), 
+    React.createElement("p", null, "at ", React.createElement("strong", null, this.props.company), ", posted at ", this.props.postedAt), 
+    React.createElement("button", {className: "edit"}, "Edit"), 
+    React.createElement("button", {className: "delete"}, "Delete")
+  )
+  }
+});
+
+ReactDOM.render(React.createElement(JobList, null), document.getElementById('jobs-container'));
+
 },{"react":164,"react-dom":1}]},{},[165]);
