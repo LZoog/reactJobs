@@ -5,10 +5,8 @@ const App = React.createClass({
   render: function() {
     return <div id="wrapper">
     <JobSearch />
-    <JobAdd />
     <JobList />
     </div>
-
   }
 })
 
@@ -30,19 +28,6 @@ const JobSearch = React.createClass({
   }
 })
 
-const JobAdd = React.createClass({
-  render: function(){
-    return <div id="add-job-div">
-    <form>
-      <input type="text" name="title" placeholder="Job Title" />
-      <input type="text" name="link" placeholder="URL" />
-      <input type="text" name="company" placeholder="Company" />
-    <button id="add-job">Add a Job</button>
-  </form>
-  </div>
-  }
-})
-
 const JobList = React.createClass({
   getInitialState: function() {
     return {jobs: []};
@@ -57,11 +42,38 @@ const JobList = React.createClass({
       self.setState({jobs: jobsDB.docs});
     });
   },
+  addJob: function(e) {
+    e.preventDefault();
+    var self = this;
+
+    console.log(e.target.newTitle);
+
+    $.ajax({
+      method: 'POST',
+      url: '/api/v1/jobs',
+      data: {
+        job: {title: e.target.newTitle, url: e.target.newLink, "company": e.target.newCompany}
+      }
+    })
+    .done(function(newJob) {
+      const allJobs = self.state.jobs;
+      allJobs.push(this.state.newJob);
+      self.setState({jobs: allJobs, title: '', url: '', company: ''});
+    });
+  },
   render: function() {
     var allJobs = this.state.jobs.map(function(job){
       return <JobItem link={job.link} title={job.title} company={job.company} postedAt={job.createdAt} key={job._id} />
     })
-    return <div>{allJobs}</div>
+    return <div id="job-add-list">
+      <form onSubmit={this.addJob}>
+        <input type="text" value={this.state.newTitle} placeholder="Job Title" />
+        <input type="text" value={this.state.newLink} placeholder="URL" />
+        <input type="text" value={this.state.newCompany} placeholder="Company" />
+        <button type="submit" id="add-job">Add a Job</button>
+      </form>
+      {allJobs}
+    </div>
   }
 })
 

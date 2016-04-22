@@ -19140,10 +19140,8 @@ const App = React.createClass({displayName: "App",
   render: function() {
     return React.createElement("div", {id: "wrapper"}, 
     React.createElement(JobSearch, null), 
-    React.createElement(JobAdd, null), 
     React.createElement(JobList, null)
     )
-
   }
 })
 
@@ -19165,19 +19163,6 @@ const JobSearch = React.createClass({displayName: "JobSearch",
   }
 })
 
-const JobAdd = React.createClass({displayName: "JobAdd",
-  render: function(){
-    return React.createElement("div", {id: "add-job-div"}, 
-    React.createElement("form", null, 
-      React.createElement("input", {type: "text", name: "title", placeholder: "Job Title"}), 
-      React.createElement("input", {type: "text", name: "link", placeholder: "URL"}), 
-      React.createElement("input", {type: "text", name: "company", placeholder: "Company"}), 
-    React.createElement("button", {id: "add-job"}, "Add a Job")
-  )
-  )
-  }
-})
-
 const JobList = React.createClass({displayName: "JobList",
   getInitialState: function() {
     return {jobs: []};
@@ -19192,11 +19177,38 @@ const JobList = React.createClass({displayName: "JobList",
       self.setState({jobs: jobsDB.docs});
     });
   },
+  addJob: function(e) {
+    e.preventDefault();
+    var self = this;
+
+    console.log(e.target.newTitle);
+
+    $.ajax({
+      method: 'POST',
+      url: '/api/v1/jobs',
+      data: {
+        job: {title: e.target.newTitle, url: e.target.newLink, "company": e.target.newCompany}
+      }
+    })
+    .done(function(newJob) {
+      const allJobs = self.state.jobs;
+      allJobs.push(this.state.newJob);
+      self.setState({jobs: allJobs, title: '', url: '', company: ''});
+    });
+  },
   render: function() {
     var allJobs = this.state.jobs.map(function(job){
       return React.createElement(JobItem, {link: job.link, title: job.title, company: job.company, postedAt: job.createdAt, key: job._id})
     })
-    return React.createElement("div", null, allJobs)
+    return React.createElement("div", {id: "job-add-list"}, 
+      React.createElement("form", {onSubmit: this.addJob}, 
+        React.createElement("input", {type: "text", value: this.state.newTitle, placeholder: "Job Title"}), 
+        React.createElement("input", {type: "text", value: this.state.newLink, placeholder: "URL"}), 
+        React.createElement("input", {type: "text", value: this.state.newCompany, placeholder: "Company"}), 
+        React.createElement("button", {type: "submit", id: "add-job"}, "Add a Job")
+      ), 
+      allJobs
+    )
   }
 })
 
