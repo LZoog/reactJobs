@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
   }, _.identity);
 
   var sort = _.pick({
-    createdAt: req.query.sort === 'createdAt' ? 'ascending' : null,
+    createdAt: req.query.sort === 'createdAt' ? 'ascending' : 'descending',
     title: req.query.sort === 'title' ? 'ascending' : null,
     company: req.query.sort === 'company' ? 'ascending' : null
   }, _.identity);
