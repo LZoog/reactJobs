@@ -63,7 +63,7 @@ const JobList = React.createClass({
   },
   render: function() {
     var allJobs = this.state.jobs.map(function(job){
-      return <JobItem link={job.link} title={job.title} company={job.company} postedAt={job.createdAt} key={job._id} />
+      return <JobItem link={job.link} title={job.title} company={job.company} postedAt={job.createdAt} key={job._id} id={job._id} />
     })
     return <div id="job-add-list">
       <form onSubmit={this.addJob}>
@@ -78,12 +78,27 @@ const JobList = React.createClass({
 })
 
 const JobItem = React.createClass({
+  getInitialState: function(){
+    return {visible: ""};
+  },
+
+  delete: function(){
+    var self = this;
+    $.ajax({
+      method: "DELETE",
+      url: "/api/v1/jobs/" + self.props.id
+    })
+    .done(function(){
+      self.setState({ visible: "hide" });
+    });
+  },
+
   render: function(){
-  return <div className="job">
+  return <div className={ `job ${this.state.visible}` }>
     <h3><a href={this.props.link}>{this.props.title}</a></h3>
     <p>at <strong>{this.props.company}</strong>, posted at {this.props.postedAt}</p>
     <button className="edit">Edit</button>
-    <button className="delete">Delete</button>
+    <button className="delete" onClick={this.delete}>Delete</button>
   </div>
   }
 });

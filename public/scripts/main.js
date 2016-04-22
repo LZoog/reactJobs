@@ -19198,7 +19198,7 @@ const JobList = React.createClass({displayName: "JobList",
   },
   render: function() {
     var allJobs = this.state.jobs.map(function(job){
-      return React.createElement(JobItem, {link: job.link, title: job.title, company: job.company, postedAt: job.createdAt, key: job._id})
+      return React.createElement(JobItem, {link: job.link, title: job.title, company: job.company, postedAt: job.createdAt, key: job._id, id: job._id})
     })
     return React.createElement("div", {id: "job-add-list"}, 
       React.createElement("form", {onSubmit: this.addJob}, 
@@ -19213,12 +19213,27 @@ const JobList = React.createClass({displayName: "JobList",
 })
 
 const JobItem = React.createClass({displayName: "JobItem",
+  getInitialState: function(){
+    return {visible: ""};
+  },
+
+  delete: function(){
+    var self = this;
+    $.ajax({
+      method: "DELETE",
+      url: "/api/v1/jobs/" + self.props.id
+    })
+    .done(function(){
+      self.setState({ visible: "hide" });
+    });
+  },
+
   render: function(){
-  return React.createElement("div", {className: "job"}, 
+  return React.createElement("div", {className:  `job ${this.state.visible}`}, 
     React.createElement("h3", null, React.createElement("a", {href: this.props.link}, this.props.title)), 
     React.createElement("p", null, "at ", React.createElement("strong", null, this.props.company), ", posted at ", this.props.postedAt), 
     React.createElement("button", {className: "edit"}, "Edit"), 
-    React.createElement("button", {className: "delete"}, "Delete")
+    React.createElement("button", {className: "delete", onClick: this.delete}, "Delete")
   )
   }
 });
