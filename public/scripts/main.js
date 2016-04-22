@@ -19136,6 +19136,48 @@ module.exports = require('./lib/React');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+const App = React.createClass({displayName: "App",
+  render: function() {
+    return React.createElement("div", {id: "wrapper"}, 
+    React.createElement(JobSearch, null), 
+    React.createElement(JobAdd, null), 
+    React.createElement(JobList, null)
+    )
+
+  }
+})
+
+const JobSearch = React.createClass({displayName: "JobSearch",
+  render: function() {
+    return React.createElement("div", {id: "jobsearch"}, 
+      React.createElement("form", {action: ""}, 
+      React.createElement("input", {type: "search", id: "search-title", placeholder: "Search by Title"}), 
+      React.createElement("input", {type: "search", id: "search-company", placeholder: "Search by Company"}), 
+      "Sort by:", 
+      React.createElement("select", {id: "sort"}, 
+        React.createElement("option", {value: ""}, "Choose..."), 
+        React.createElement("option", {value: "createdAt"}, "Created At"), 
+        React.createElement("option", {value: "title"}, "Title"), 
+        React.createElement("option", {value: "company"}, "Company")
+      )
+    )
+    )
+  }
+})
+
+const JobAdd = React.createClass({displayName: "JobAdd",
+  render: function(){
+    return React.createElement("div", {id: "add-job-div"}, 
+    React.createElement("form", null, 
+      React.createElement("input", {type: "text", name: "title", placeholder: "Job Title"}), 
+      React.createElement("input", {type: "text", name: "link", placeholder: "URL"}), 
+      React.createElement("input", {type: "text", name: "company", placeholder: "Company"}), 
+    React.createElement("button", {id: "add-job"}, "Add a Job")
+  )
+  )
+  }
+})
+
 const JobList = React.createClass({displayName: "JobList",
   getInitialState: function() {
     return {jobs: []};
@@ -19147,15 +19189,13 @@ const JobList = React.createClass({displayName: "JobList",
       url: "/api/v1/jobs"
     })
     .done(function(jobsDB){
-      self.setState({jobs: jobsDB});
+      self.setState({jobs: jobsDB.docs});
     });
   },
   render: function() {
-    if (this.state.jobs.docs != undefined) {
-      var allJobs = this.state.jobs.docs.map(function(job){
-        return React.createElement(JobItem, {link: job.link, title: job.title, company: job.company, postedAt: job.createdAt, key: job._id})
-      })
-    }
+    var allJobs = this.state.jobs.map(function(job){
+      return React.createElement(JobItem, {link: job.link, title: job.title, company: job.company, postedAt: job.createdAt, key: job._id})
+    })
     return React.createElement("div", null, allJobs)
   }
 })
@@ -19171,6 +19211,6 @@ const JobItem = React.createClass({displayName: "JobItem",
   }
 });
 
-ReactDOM.render(React.createElement(JobList, null), document.getElementById('jobs-container'));
+ReactDOM.render(React.createElement(App, null), document.getElementById('app'));
 
 },{"react":164,"react-dom":1}]},{},[165]);

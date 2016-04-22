@@ -1,6 +1,48 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+const App = React.createClass({
+  render: function() {
+    return <div id="wrapper">
+    <JobSearch />
+    <JobAdd />
+    <JobList />
+    </div>
+
+  }
+})
+
+const JobSearch = React.createClass({
+  render: function() {
+    return <div id="jobsearch">
+      <form action="">
+      <input type="search" id="search-title" placeholder="Search by Title" />
+      <input type="search" id="search-company" placeholder="Search by Company" />
+      Sort by:
+      <select id="sort">
+        <option value="">Choose...</option>
+        <option value="createdAt">Created At</option>
+        <option value="title">Title</option>
+        <option value="company">Company</option>
+      </select>
+    </form>
+    </div>
+  }
+})
+
+const JobAdd = React.createClass({
+  render: function(){
+    return <div id="add-job-div">
+    <form>
+      <input type="text" name="title" placeholder="Job Title" />
+      <input type="text" name="link" placeholder="URL" />
+      <input type="text" name="company" placeholder="Company" />
+    <button id="add-job">Add a Job</button>
+  </form>
+  </div>
+  }
+})
+
 const JobList = React.createClass({
   getInitialState: function() {
     return {jobs: []};
@@ -12,15 +54,13 @@ const JobList = React.createClass({
       url: "/api/v1/jobs"
     })
     .done(function(jobsDB){
-      self.setState({jobs: jobsDB});
+      self.setState({jobs: jobsDB.docs});
     });
   },
   render: function() {
-    if (this.state.jobs.docs != undefined) {
-      var allJobs = this.state.jobs.docs.map(function(job){
-        return <JobItem link={job.link} title={job.title} company={job.company} postedAt={job.createdAt} key={job._id} />
-      })
-    }
+    var allJobs = this.state.jobs.map(function(job){
+      return <JobItem link={job.link} title={job.title} company={job.company} postedAt={job.createdAt} key={job._id} />
+    })
     return <div>{allJobs}</div>
   }
 })
@@ -36,4 +76,4 @@ const JobItem = React.createClass({
   }
 });
 
-ReactDOM.render(<JobList />, document.getElementById('jobs-container'));
+ReactDOM.render(<App />, document.getElementById('app'));
